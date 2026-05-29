@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fișe Subiecte Farmacie</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    font-family: Georgia, serif;
+    padding: 24px 16px 48px;
+    color: #fff;
+  }
+
+  .header { text-align: center; margin-bottom: 28px; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 7px 22px;
+    color: #a8d8ea;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 { font-size: clamp(22px,5vw,34px); font-weight: 700; letter-spacing: -1px; margin-bottom: 6px; }
+  .subtitle { color: #8ab4c8; font-size: 14px; }
+
+  /* LANG TOGGLE */
+  .lang-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 0 auto 24px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 30px;
+    padding: 4px;
+    width: fit-content;
+  }
+  .lang-btn {
+    border: none;
+    border-radius: 26px;
+    padding: 8px 22px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    font-weight: 600;
+    transition: all 0.2s;
+    background: transparent;
+    color: #8ab4c8;
+  }
+  .lang-btn.active {
+    background: linear-gradient(135deg, #00b4d8, #0077b6);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(0,180,216,0.4);
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 800px;
+    margin: 0 auto 28px;
+  }
+  .tab {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #8ab4c8;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    transition: all 0.2s;
+  }
+  .tab:hover { background: rgba(255,255,255,0.13); color: #fff; }
+  .tab.active {
+    background: linear-gradient(135deg, #00b4d8, #0077b6);
+    border-color: #00b4d8;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* CARD */
+  .card { max-width: 800px; margin: 0 auto; display: none; flex-direction: column; gap: 20px; }
+  .card.active { display: flex; }
+
+  .card-emoji { text-align: center; font-size: 40px; margin-bottom: 4px; }
+  .card-title { text-align: center; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+
+  .section { border-radius: 16px; padding: 18px 20px; }
+  .section-symptome { background: rgba(0,180,216,0.1); border: 1px solid rgba(0,180,216,0.3); }
+  .section-cause { background: rgba(247,127,0,0.1); border: 1px solid rgba(247,127,0,0.3); }
+  .section-traitement { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); }
+  .section-dialog { background: rgba(156,39,176,0.1); border: 1px solid rgba(156,39,176,0.3); }
+
+  .section-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-family: monospace; margin-bottom: 12px; }
+  .section-symptome .section-title { color: #00b4d8; }
+  .section-cause .section-title { color: #f77f00; }
+  .section-traitement .section-title { color: #66bb6a; }
+  .section-dialog .section-title { color: #ce93d8; }
+
+  .item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; line-height: 1.55; color: #e0e0e0; }
+  .item:last-child { border-bottom: none; }
+  .item-dot { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; }
+  .section-symptome .item-dot { background: #00b4d8; }
+  .section-cause .item-dot { background: #f77f00; }
+  .section-traitement .item-dot { background: #66bb6a; }
+
+  .dialog-line { padding: 8px 12px; border-radius: 10px; font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+  .dialog-line:last-child { margin-bottom: 0; }
+  .dialog-F { background: rgba(0,180,216,0.15); border-left: 3px solid #00b4d8; color: #e0f7fa; }
+  .dialog-P { background: rgba(247,127,0,0.15); border-left: 3px solid #f77f00; color: #fff3e0; }
+  .dialog-who { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-family: monospace; margin-bottom: 3px; }
+  .dialog-F .dialog-who { color: #00b4d8; }
+  .dialog-P .dialog-who { color: #f77f00; }
+
+  .tip { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 12px; padding: 12px 16px; color: #ffe082; font-size: 13px; line-height: 1.6; }
+  .tip strong { color: #ffc107; }
+
+  .footer { text-align: center; color: #4a7a8a; font-size: 12px; letter-spacing: 1px; margin-top: 36px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Examen Oral · Farmacie FR II</div>
+  <h1>Fișe Subiecte 📋</h1>
+  <p class="subtitle">Toate cele 9 subiecte — simptome, cauze, tratament, dialog</p>
+</div>
+
+<!-- LANG TOGGLE -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="btn-ro" onclick="setLang('ro')">🇷🇴 Română</button>
+  <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">🇫🇷 Français</button>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div id="cards"></div>
+
+<div class="footer">Bulele albastre = Farmacist · Bulele portocalii = Pacient</div>
+
+<script>
+const SUBJECTS = [
+  {
+    emoji: "🤧",
+    title: { ro: "Răceală 1 — Tratament Naturist", fr: "Rhume 1 — Traitement Naturel" },
+    simptome: {
+      ro: ["Nas înfundat sau nas care curge", "Tuse ușoară", "Durere în gât", "Oboseală și stare generală proastă", "Febră ușoară (37–38°C)"],
+      fr: ["Nez bouché ou qui coule", "Toux légère", "Mal de gorge", "Fatigue et malaise général", "Légère fièvre (37–38°C)"]
+    },
+    cauze: {
+      ro: ["Expunere la frig sau curenți de aer", "Contact cu o persoană bolnavă", "Sistem imunitar slăbit", "Schimbarea bruscă a temperaturii"],
+      fr: ["Exposition au froid ou aux courants d'air", "Contact avec une personne malade", "Système immunitaire affaibli", "Changement brusque de température"]
+    },
+    tratament: {
+      ro: ["🍵 Ceai de tei cu miere — de 3 ori pe zi, calmează gâtul", "🍋 Vitamina C (lămâie sau comprimate) — dimineața, întărește imunitatea", "🫚 Sirop de miere cu ghimbir și lămâie — antiinflamator natural", "🌿 Ceai de soc — ajută la scăderea febrei", "💧 Inhalații cu apă caldă și eucalipt — desfundă nasul"],
+      fr: ["🍵 Tisane de tilleul avec du miel — 3 fois par jour, apaise la gorge", "🍋 Vitamine C (citron ou comprimés) — le matin, renforce l'immunité", "🫚 Sirop de miel avec gingembre et citron — anti-inflammatoire naturel", "🌿 Tisane de sureau — aide à faire baisser la fièvre", "💧 Inhalations à l'eau chaude et à l'eucalyptus — dégage le nez"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Am nas înfundat, tuse ușoară și mă doare puțin gâtul. De două zile." },
+        { role: "F", text: "Înțeleg. Știți care ar putea fi cauza?" },
+        { role: "P", text: "Cred că am răcit, a fost foarte frig afară ieri." },
+        { role: "F", text: "Pare o răceală ușoară. Deoarece preferați tratamentul naturist, vă recomand ceai de tei cu miere de trei ori pe zi și vitamina C în fiecare dimineață." },
+        { role: "F", text: "Odihniți-vă, beți multă apă caldă și evitați frigul." }
+      ],
+      fr: [
+        { role: "P", text: "J'ai le nez bouché, une légère toux et un peu mal à la gorge. Depuis deux jours." },
+        { role: "F", text: "Je vois. Savez-vous quelle pourrait être la cause ?" },
+        { role: "P", text: "Je crois que j'ai pris froid, il faisait très froid dehors hier." },
+        { role: "F", text: "Cela ressemble à un rhume léger. Comme vous préférez le traitement naturel, je vous recommande une tisane de tilleul au miel trois fois par jour et de la vitamine C chaque matin." },
+        { role: "F", text: "Reposez-vous, buvez beaucoup d'eau chaude et évitez le froid." }
+      ]
+    },
+    tip: { ro: "⚠️ Tratament NATURIST = fără medicamente chimice! Ceaiuri, miere, lămâie, ghimbir, vitamina C naturală.", fr: "⚠️ Traitement NATUREL = sans médicaments chimiques ! Tisanes, miel, citron, gingembre, vitamine C naturelle." }
+  },
+  {
+    emoji: "🤒",
+    title: { ro: "Răceală 2", fr: "Rhume 2" },
+    simptome: {
+      ro: ["Nas înfundat sau nas care curge", "Tuse (uscată sau cu mucus)", "Durere în gât", "Febră (38–39°C)", "Dureri musculare și oboseală", "Durere de cap"],
+      fr: ["Nez bouché ou qui coule", "Toux (sèche ou grasse)", "Mal de gorge", "Fièvre (38–39°C)", "Douleurs musculaires et fatigue", "Mal de tête"]
+    },
+    cauze: {
+      ro: ["Virus (răceală comună sau gripă ușoară)", "Expunere la frig", "Contact cu persoane bolnave", "Sistem imunitar slăbit"],
+      fr: ["Virus (rhume commun ou grippe légère)", "Exposition au froid", "Contact avec des personnes malades", "Système immunitaire affaibli"]
+    },
+    tratament: {
+      ro: ["💊 Paracetamol (500mg) — de 3 ori pe zi după masă, pentru febră și dureri", "🍶 Sirop de tuse (ex: Tussin) — de 3 ori pe zi", "💧 Spray nazal (ex: Otrivin) — de 2–3 ori pe zi, desfundă nasul", "🔴 Pastile pentru gât (ex: Strepsils) — de 3–4 ori pe zi", "🧴 Vitamina C 1000mg — o dată pe zi dimineața"],
+      fr: ["💊 Paracétamol (500mg) — 3 fois par jour après les repas, pour la fièvre et les douleurs", "🍶 Sirop contre la toux (ex: Tussin) — 3 fois par jour", "💧 Spray nasal (ex: Otrivin) — 2–3 fois par jour, dégage le nez", "🔴 Pastilles pour la gorge (ex: Strepsils) — 3–4 fois par jour", "🧴 Vitamine C 1000mg — une fois par jour le matin"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Am nas înfundat, tuse și febră ușoară. De trei zile." },
+        { role: "F", text: "Aveți și dureri de cap sau musculare?" },
+        { role: "P", text: "Da, sunt și foarte obosit(ă)." },
+        { role: "F", text: "Pare o răceală. Vă recomand Paracetamol, câte o tabletă de trei ori pe zi după masă, și un sirop de tuse de trei ori pe zi." },
+        { role: "F", text: "Odihniți-vă mult, beți lichide calde și evitați frigul." }
+      ],
+      fr: [
+        { role: "P", text: "J'ai le nez bouché, de la toux et une légère fièvre. Depuis trois jours." },
+        { role: "F", text: "Avez-vous aussi des maux de tête ou des douleurs musculaires ?" },
+        { role: "P", text: "Oui, je suis aussi très fatigué(e)." },
+        { role: "F", text: "Cela ressemble à un rhume. Je vous recommande du Paracétamol, un comprimé trois fois par jour après les repas, et un sirop contre la toux trois fois par jour." },
+        { role: "F", text: "Reposez-vous beaucoup, buvez des liquides chauds et évitez le froid." }
+      ]
+    },
+    tip: { ro: "⚠️ Răceală 2 = tratament cu medicamente! Paracetamol, sirop, spray nazal.", fr: "⚠️ Rhume 2 = traitement médicamenteux ! Paracétamol, sirop, spray nasal." }
+  },
+  {
+    emoji: "😴",
+    title: { ro: "Insomnie", fr: "Insomnie" },
+    simptome: {
+      ro: ["Dificultate în a adormi", "Treziri frecvente în timpul nopții", "Oboseală dimineața la trezire", "Iritabilitate și lipsă de concentrare ziua", "Dureri de cap cauzate de oboseală"],
+      fr: ["Difficulté à s'endormir", "Réveils fréquents pendant la nuit", "Fatigue au réveil le matin", "Irritabilité et manque de concentration dans la journée", "Maux de tête causés par la fatigue"]
+    },
+    cauze: {
+      ro: ["Stres și anxietate (muncă, examene)", "Utilizarea ecranelor înainte de culcare", "Cafea sau alcool seara", "Program de somn neregulat", "Cameră prea caldă sau zgomotoasă"],
+      fr: ["Stress et anxiété (travail, examens)", "Utilisation des écrans avant de dormir", "Café ou alcool le soir", "Horaires de sommeil irréguliers", "Chambre trop chaude ou bruyante"]
+    },
+    tratament: {
+      ro: ["🌿 Ceai de valeriană — o ceașcă cu 30 min înainte de culcare", "🌼 Ceai de mușețel — relaxant natural, seara", "💊 Melatonină (1–3mg) — o tabletă cu 30 min înainte de culcare", "🌱 Passiflora — comprimate sau ceai, reduce anxietatea", "💊 Magneziu — o tabletă seara, relaxare musculară"],
+      fr: ["🌿 Tisane de valériane — une tasse 30 min avant de dormir", "🌼 Tisane de camomille — relaxant naturel, le soir", "💊 Mélatonine (1–3mg) — un comprimé 30 min avant de dormir", "🌱 Passiflore — comprimés ou tisane, réduit l'anxiété", "💊 Magnésium — un comprimé le soir, relaxation musculaire"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Nu pot să dorm noaptea de o săptămână. Mă trezesc des și dimineața sunt epuizat(ă)." },
+        { role: "F", text: "Știți care ar putea fi cauza?" },
+        { role: "P", text: "Cred că din cauza stresului de la examene și stau mult pe telefon seara." },
+        { role: "F", text: "Vă recomand un ceai de valeriană în fiecare seară cu 30 de minute înainte de culcare, și melatonină dacă ceaiul nu este suficient." },
+        { role: "F", text: "Evitați telefonul cu o oră înainte de somn și aerisiți camera." }
+      ],
+      fr: [
+        { role: "P", text: "Je n'arrive pas à dormir la nuit depuis une semaine. Je me réveille souvent et je suis épuisé(e) le matin." },
+        { role: "F", text: "Savez-vous quelle pourrait être la cause ?" },
+        { role: "P", text: "Je crois que c'est à cause du stress des examens et je reste beaucoup sur mon téléphone le soir." },
+        { role: "F", text: "Je vous recommande une tisane de valériane chaque soir 30 minutes avant de dormir, et de la mélatonine si la tisane ne suffit pas." },
+        { role: "F", text: "Évitez le téléphone une heure avant de dormir et aérez votre chambre." }
+      ]
+    },
+    tip: { ro: "💡 Cuvinte cheie: a adormi = s'endormir / treziri frecvente = réveils fréquents / oboseală = fatigue", fr: "💡 Mots clés en roumain : a adormi = s'endormir / treziri frecvente = réveils fréquents / oboseală = fatigue" }
+  },
+  {
+    emoji: "😰",
+    title: { ro: "Stres", fr: "Stress" },
+    simptome: {
+      ro: ["Dureri de cap frecvente", "Tensiune musculară (gât, umeri)", "Oboseală cronică", "Dificultate de concentrare", "Iritabilitate și nervozitate", "Tulburări de somn", "Palpitații (inimă care bate repede)"],
+      fr: ["Maux de tête fréquents", "Tension musculaire (cou, épaules)", "Fatigue chronique", "Difficulté à se concentrer", "Irritabilité et nervosité", "Troubles du sommeil", "Palpitations (cœur qui bat vite)"]
+    },
+    cauze: {
+      ro: ["Suprasolicitare la muncă sau studii", "Probleme personale sau familiale", "Examene sau termene limită", "Lipsă de timp liber și odihnă"],
+      fr: ["Surmenage au travail ou dans les études", "Problèmes personnels ou familiaux", "Examens ou délais à respecter", "Manque de temps libre et de repos"]
+    },
+    tratament: {
+      ro: ["💊 Magneziu (300–400mg) — o tabletă pe zi, reduce tensiunea nervoasă", "🌼 Ceai de mușețel — de 2–3 ori pe zi, calmant natural", "🌿 Valeriana sau Passiflora — comprimate sau ceai, seara", "💊 Vitamina B complex — ajută sistemul nervos", "🧘 Exerciții de respirație și relaxare"],
+      fr: ["💊 Magnésium (300–400mg) — un comprimé par jour, réduit la tension nerveuse", "🌼 Tisane de camomille — 2–3 fois par jour, calmant naturel", "🌿 Valériane ou Passiflore — comprimés ou tisane, le soir", "💊 Vitamines B complexe — aide le système nerveux", "🧘 Exercices de respiration et de relaxation"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Sunt foarte stresat(ă) de la muncă. Am dureri de cap, nu dorm bine și sunt mereu obosit(ă)." },
+        { role: "F", text: "De când aveți aceste simptome?" },
+        { role: "P", text: "De câteva săptămâni, de când am început o perioadă grea la muncă." },
+        { role: "F", text: "Vă recomand magneziu, câte o tabletă pe zi după masă, și un ceai de mușețel seara." },
+        { role: "F", text: "Faceți pauze regulate, ieșiți la aer și dormiți cel puțin 7–8 ore." }
+      ],
+      fr: [
+        { role: "P", text: "Je suis très stressé(e) à cause du travail. J'ai des maux de tête, je dors mal et je suis toujours fatigué(e)." },
+        { role: "F", text: "Depuis combien de temps avez-vous ces symptômes ?" },
+        { role: "P", text: "Depuis quelques semaines, depuis que j'ai commencé une période difficile au travail." },
+        { role: "F", text: "Je vous recommande du magnésium, un comprimé par jour après le repas, et une tisane de camomille le soir." },
+        { role: "F", text: "Faites des pauses régulières, sortez à l'air frais et dormez au moins 7–8 heures." }
+      ]
+    },
+    tip: { ro: "💡 Stres ≠ Insomnie! La stres: tensiune, iritabilitate, palpitații. La insomnie: probleme cu somnul.", fr: "💡 Stress ≠ Insomnie ! Pour le stress : tension, irritabilité, palpitations. Pour l'insomnie : problèmes de sommeil." }
+  },
+  {
+    emoji: "🌱",
+    title: { ro: "Astenie de Primăvară", fr: "Asthénie de Printemps" },
+    simptome: {
+      ro: ["Oboseală generală fără motiv aparent", "Lipsă de energie și motivație", "Somnolență în timpul zilei", "Dureri musculare ușoare", "Dispoziție proastă, tristețe ușoară", "Lipsă de apetit"],
+      fr: ["Fatigue générale sans raison apparente", "Manque d'énergie et de motivation", "Somnolence pendant la journée", "Légères douleurs musculaires", "Mauvaise humeur, légère tristesse", "Manque d'appétit"]
+    },
+    cauze: {
+      ro: ["Schimbarea sezonului (iarnă → primăvară)", "Schimbarea orei (ora de vară)", "Lipsă de vitamina D după iarnă", "Organism care se adaptează la schimbări", "Alimentație deficitară în vitamine pe timp de iarnă"],
+      fr: ["Changement de saison (hiver → printemps)", "Changement d'heure (heure d'été)", "Manque de vitamine D après l'hiver", "Organisme qui s'adapte aux changements", "Alimentation pauvre en vitamines pendant l'hiver"]
+    },
+    tratament: {
+      ro: ["💊 Multivitamine — o tabletă pe zi dimineața după masă", "🌞 Vitamina D3 — o capsulă pe zi", "💊 Fier + acid folic — dacă există anemie", "🌿 Polen de albine sau propolis — energizant natural", "🥗 Alimentație bogată în fructe și legume proaspete"],
+      fr: ["💊 Multivitamines — un comprimé par jour le matin après le repas", "🌞 Vitamine D3 — une capsule par jour", "💊 Fer + acide folique — en cas d'anémie", "🌿 Pollen d'abeille ou propolis — énergisant naturel", "🥗 Alimentation riche en fruits et légumes frais"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Mă simt foarte obosit(ă) și fără energie de câteva zile, deși dorm suficient." },
+        { role: "F", text: "Știți care ar putea fi cauza?" },
+        { role: "P", text: "Nu știu exact, dar se întâmplă în fiecare primăvară." },
+        { role: "F", text: "Pare astenie de primăvară. Vă recomand un complex de multivitamine, câte o tabletă în fiecare dimineață după masă." },
+        { role: "F", text: "Mâncați fructe și legume proaspete, ieșiți la soare și faceți mișcare ușoară." }
+      ],
+      fr: [
+        { role: "P", text: "Je me sens très fatigué(e) et sans énergie depuis quelques jours, même si je dors suffisamment." },
+        { role: "F", text: "Savez-vous quelle pourrait être la cause ?" },
+        { role: "P", text: "Je ne sais pas exactement, mais ça arrive chaque printemps." },
+        { role: "F", text: "Cela ressemble à une asthénie de printemps. Je vous recommande un complexe de multivitamines, un comprimé chaque matin après le repas." },
+        { role: "F", text: "Mangez des fruits et légumes frais, sortez au soleil et faites un peu d'exercice léger." }
+      ]
+    },
+    tip: { ro: "💡 Astenie de primăvară = oboseală sezonieră la schimbarea sezonului iarnă-primăvară.", fr: "💡 Asthénie de printemps = fatigue saisonnière lors du passage hiver-printemps." }
+  },
+  {
+    emoji: "🤕",
+    title: { ro: "Durere de Cap", fr: "Mal de Tête" },
+    simptome: {
+      ro: ["Durere pulsatilă sau apăsătoare la cap", "Durere în zona frunții sau a tâmplelor", "Sensibilitate la lumină sau zgomot", "Oboseală oculară (ochi obosiți)", "Greață în cazuri severe", "Tensiune în gât și umeri"],
+      fr: ["Douleur pulsatile ou oppressante à la tête", "Douleur au niveau du front ou des tempes", "Sensibilité à la lumière ou au bruit", "Fatigue oculaire (yeux fatigués)", "Nausées dans les cas sévères", "Tension dans le cou et les épaules"]
+    },
+    cauze: {
+      ro: ["Stres și oboseală", "Utilizarea îndelungată a ecranelor", "Deshidratare (lipsă de apă)", "Lipsă de somn", "Tensiune musculară în gât și umeri", "Lumină prea puternică sau insuficientă"],
+      fr: ["Stress et fatigue", "Utilisation prolongée des écrans", "Déshydratation (manque d'eau)", "Manque de sommeil", "Tension musculaire dans le cou et les épaules", "Lumière trop forte ou insuffisante"]
+    },
+    tratament: {
+      ro: ["💊 Paracetamol (500–1000mg) — o tabletă la nevoie, maxim 3 pe zi", "💊 Ibuprofen (400mg) — o tabletă după masă, maxim 3 pe zi", "💧 Multă apă — hidratare imediată", "🌿 Ceai de mentă — aplicat pe tâmple sau băut", "😴 Odihnă într-o cameră liniștită și întunecată"],
+      fr: ["💊 Paracétamol (500–1000mg) — un comprimé si besoin, maximum 3 par jour", "💊 Ibuprofène (400mg) — un comprimé après le repas, maximum 3 par jour", "💧 Beaucoup d'eau — hydratation immédiate", "🌿 Tisane de menthe — appliquée sur les tempes ou bue", "😴 Repos dans une pièce calme et sombre"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Mă doare capul de ieri, mai ales în zona frunții. Am stat mult la calculator." },
+        { role: "F", text: "Aveți și greață sau sensibilitate la lumină?" },
+        { role: "P", text: "Nu, doar oboseală la ochi și tensiune în umeri." },
+        { role: "F", text: "Pare o durere de cap de tensiune. Vă recomand Ibuprofen, câte o tabletă după masă, maxim de trei ori pe zi." },
+        { role: "F", text: "Beți multă apă, faceți pauze de la ecrane la fiecare 30 de minute și odihniți-vă ochii." }
+      ],
+      fr: [
+        { role: "P", text: "J'ai mal à la tête depuis hier, surtout au niveau du front. J'ai beaucoup travaillé sur ordinateur." },
+        { role: "F", text: "Avez-vous aussi des nausées ou une sensibilité à la lumière ?" },
+        { role: "P", text: "Non, juste de la fatigue aux yeux et de la tension dans les épaules." },
+        { role: "F", text: "Cela ressemble à un mal de tête de tension. Je vous recommande de l'Ibuprofène, un comprimé après le repas, maximum trois fois par jour." },
+        { role: "F", text: "Buvez beaucoup d'eau, faites des pauses toutes les 30 minutes et reposez vos yeux." }
+      ]
+    },
+    tip: { ro: "💡 Durere de cap de tensiune (ecrane/stres) ≠ migrenă. La examen, probabil e de tensiune.", fr: "💡 Mal de tête de tension (écrans/stress) ≠ migraine. À l'examen, c'est probablement de tension." }
+  },
+  {
+    emoji: "🔙",
+    title: { ro: "Durere de Spate", fr: "Mal de Dos" },
+    simptome: {
+      ro: ["Durere în zona lombară (spatele jos)", "Durere musculară după efort", "Rigiditate matinală (greu de mișcat dimineața)", "Durere care se agravează la mișcare", "Tensiune musculară în zona spatelui"],
+      fr: ["Douleur dans la zone lombaire (bas du dos)", "Douleur musculaire après l'effort", "Raideur matinale (difficile à bouger le matin)", "Douleur qui s'aggrave avec le mouvement", "Tension musculaire dans le dos"]
+    },
+    cauze: {
+      ro: ["Efort fizic intens la sala de sport", "Mișcări greșite la grădinărit (aplecări repetate)", "Ridicare de greutăți incorectă", "Stat jos mult timp (birou, mașină)", "Postură incorectă"],
+      fr: ["Effort physique intense à la salle de sport", "Mauvais mouvements au jardinage (flexions répétées)", "Soulèvement incorrect de charges lourdes", "Position assise prolongée (bureau, voiture)", "Mauvaise posture"]
+    },
+    tratament: {
+      ro: ["🧴 Gel antiinflamator (ex: Voltaren, Diclofenac) — aplicat de 2–3 ori pe zi", "💊 Ibuprofen (400mg) — o tabletă de 3 ori pe zi după masă, 5 zile", "🔥 Plasture termic (ex: Thermacare) — aplicat direct pe spate, 8–12 ore", "💊 Miorelaxant (ex: Mydocalm) — relaxează mușchii, seara", "🏥 Repaus relativ — evitați efortul, dar mișcați-vă ușor"],
+      fr: ["🧴 Gel anti-inflammatoire (ex: Voltaren, Diclofénac) — appliqué 2–3 fois par jour", "💊 Ibuprofène (400mg) — un comprimé 3 fois par jour après les repas, 5 jours", "🔥 Patch chauffant (ex: Thermacare) — appliqué directement sur le dos, 8–12h", "💊 Myorelaxant (ex: Mydocalm) — relaxe les muscles, le soir", "🏥 Repos relatif — évitez l'effort mais bougez doucement"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Mă doare spatele foarte tare de ieri. Am fost la sala de sport și cred că am exagerat." },
+        { role: "F", text: "Durerea este în zona lombară, jos?" },
+        { role: "P", text: "Da, exact, și am și tensiune musculară." },
+        { role: "F", text: "Pare o contractură musculară. Vă recomand gel Diclofenac, de trei ori pe zi pe zona dureroasă, și Ibuprofen câte o tabletă după masă." },
+        { role: "F", text: "Evitați efortul fizic câteva zile și puteți aplica căldură locală." }
+      ],
+      fr: [
+        { role: "P", text: "J'ai très mal au dos depuis hier. Je suis allé(e) à la salle de sport et je crois que j'ai exagéré." },
+        { role: "F", text: "La douleur est dans la zone lombaire, en bas ?" },
+        { role: "P", text: "Oui, exactement, et j'ai aussi de la tension musculaire." },
+        { role: "F", text: "Cela ressemble à une contracture musculaire. Je vous recommande le gel Diclofénac, trois fois par jour sur la zone douloureuse, et de l'Ibuprofène un comprimé après le repas." },
+        { role: "F", text: "Évitez l'effort physique quelques jours et vous pouvez appliquer de la chaleur localement." }
+      ]
+    },
+    tip: { ro: "💡 Contractură musculară = tensiune/blocare musculară după efort. Gel + căldură + repaus.", fr: "💡 Contracture musculaire = tension/blocage musculaire après l'effort. Gel + chaleur + repos." }
+  },
+  {
+    emoji: "🗣️",
+    title: { ro: "Durere de Gât", fr: "Mal de Gorge" },
+    simptome: {
+      ro: ["Durere la înghițit", "Gât iritat și uscat", "Voce răgușită", "Roșeață în gât", "Senzație de arsură în gât", "Ganglioni umflați (în cazuri severe)"],
+      fr: ["Douleur en avalant", "Gorge irritée et sèche", "Voix enrouée", "Rougeur dans la gorge", "Sensation de brûlure dans la gorge", "Ganglions gonflés (dans les cas graves)"]
+    },
+    cauze: {
+      ro: ["Vorbit mult sau țipat (profesori, concert, meci)", "Aer uscat sau aer condiționat", "Răceală sau infecție virală", "Fumat sau expunere la fum", "Alergie"],
+      fr: ["Beaucoup parlé ou crié (professeurs, concert, match)", "Air sec ou climatisation", "Rhume ou infection virale", "Tabac ou exposition à la fumée", "Allergie"]
+    },
+    tratament: {
+      ro: ["💊 Pastile de supt (ex: Strepsils, Septolete) — de 4–5 ori pe zi", "🌬️ Spray pentru gât (ex: Tantum Verde, Hexoral) — de 3–4 ori pe zi", "🍵 Ceai de salvie sau cimbru cu miere — de 3 ori pe zi", "🧂 Gargară cu apă sărată caldă — de 3 ori pe zi", "💊 Ibuprofen — dacă există durere puternică și inflamație"],
+      fr: ["💊 Pastilles à sucer (ex: Strepsils) — 4–5 fois par jour", "🌬️ Spray pour la gorge (ex: Tantum Verde) — 3–4 fois par jour", "🍵 Tisane de sauge ou de thym avec du miel — 3 fois par jour", "🧂 Gargarisme à l'eau salée tiède — 3 fois par jour", "💊 Ibuprofène — si forte douleur et inflammation"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Mă doare gâtul când înghit și am vocea răgușită. Am vorbit mult ieri la o prezentare." },
+        { role: "F", text: "Aveți și febră sau ganglioni umflați?" },
+        { role: "P", text: "Nu, doar gâtul iritat și puțin uscat." },
+        { role: "F", text: "Pare o iritație a gâtului. Vă recomand spray Tantum Verde de trei ori pe zi și pastile Strepsils de supt de patru ori pe zi." },
+        { role: "F", text: "Beți ceaiuri calde cu miere, evitați să vorbiți mult și stați departe de frig." }
+      ],
+      fr: [
+        { role: "P", text: "J'ai mal à la gorge quand j'avale et j'ai la voix enrouée. J'ai beaucoup parlé hier lors d'une présentation." },
+        { role: "F", text: "Avez-vous aussi de la fièvre ou des ganglions gonflés ?" },
+        { role: "P", text: "Non, juste la gorge irritée et un peu sèche." },
+        { role: "F", text: "Cela ressemble à une irritation de la gorge. Je vous recommande le spray Tantum Verde trois fois par jour et des pastilles Strepsils à sucer quatre fois par jour." },
+        { role: "F", text: "Buvez des tisanes chaudes avec du miel, évitez de parler beaucoup et restez à l'abri du froid." }
+      ]
+    },
+    tip: { ro: "💡 Iritație de gât (după vorbit mult) ≠ angină (cu febră mare, ganglioni). La examen: iritație.", fr: "💡 Irritation de gorge (après avoir beaucoup parlé) ≠ angine (avec forte fièvre). À l'examen : irritation." }
+  },
+  {
+    emoji: "🤢",
+    title: { ro: "Durere de Stomac", fr: "Mal au Ventre" },
+    simptome: {
+      ro: ["Durere sau crampe abdominale", "Greață", "Balonare (stomac umflat)", "Arsuri la stomac (reflux)", "Digestie grea după masă", "Lipsă de apetit"],
+      fr: ["Douleur ou crampes abdominales", "Nausées", "Ballonnements (ventre gonflé)", "Brûlures d'estomac (reflux)", "Digestion difficile après le repas", "Manque d'appétit"]
+    },
+    cauze: {
+      ro: ["Mâncat prea mult sau prea repede", "Alimente grele sau grase", "Stres și anxietate", "Cafea pe stomacul gol", "Intoleranță alimentară", "Alimente expirate sau contaminate"],
+      fr: ["Avoir trop mangé ou trop vite", "Aliments lourds ou gras", "Stress et anxiété", "Café à jeun", "Intolérance alimentaire", "Aliments périmés ou contaminés"]
+    },
+    tratament: {
+      ro: ["💊 Antiacid (ex: Maalox, Rennie) — 1–2 comprimate mestecate după masă", "💊 Simeticonă (ex: Espumisan) — pentru balonare, după masă", "🌿 Ceai de mentă sau mușețel — de 3 ori pe zi între mese", "💊 Cărbune activ — pentru balonare sau intoxicații ușoare", "🍚 Dietă ușoară: orez fiert, supă, biscuiți simpli"],
+      fr: ["💊 Antiacide (ex: Maalox, Rennie) — 1–2 comprimés à mâcher après le repas", "💊 Siméticone (ex: Espumisan) — pour les ballonnements, après le repas", "🌿 Tisane de menthe ou camomille — 3 fois par jour entre les repas", "💊 Charbon actif — pour les ballonnements ou intoxications légères", "🍚 Régime léger : riz cuit, soupe, biscuits simples"]
+    },
+    dialog: {
+      ro: [
+        { role: "P", text: "Mă doare stomacul și am greață de ieri seară. Am mâncat cam mult la cină." },
+        { role: "F", text: "Aveți și balonare sau arsuri la stomac?" },
+        { role: "P", text: "Da, am și stomacul umflat și puțin arsuri." },
+        { role: "F", text: "Pare o indigestie. Vă recomand antiacid Rennie, câte două comprimate mestecate după masă, și ceai de mentă de trei ori pe zi." },
+        { role: "F", text: "Mâncați ușor câteva zile: supă, orez, evitați alimentele grase și cafeaua." }
+      ],
+      fr: [
+        { role: "P", text: "J'ai mal au ventre et des nausées depuis hier soir. J'ai un peu trop mangé au dîner." },
+        { role: "F", text: "Avez-vous aussi des ballonnements ou des brûlures d'estomac ?" },
+        { role: "P", text: "Oui, j'ai aussi le ventre gonflé et un peu de brûlures." },
+        { role: "F", text: "Cela ressemble à une indigestion. Je vous recommande l'antiacide Rennie, deux comprimés à mâcher après le repas, et une tisane de menthe trois fois par jour." },
+        { role: "F", text: "Mangez légèrement quelques jours : soupe, riz, évitez les aliments gras et le café." }
+      ]
+    },
+    tip: { ro: "💡 Indigestie = digestie proastă după masă. Stres gastric = durere de stomac cauzată de stres.", fr: "💡 Indigestion = mauvaise digestion après le repas. Stress gastrique = mal au ventre causé par le stress." }
+  }
+];
+
+let currentLang = "ro";
+let currentCard = 0;
+
+const TAB_LABELS = {
+  ro: ["🤧 Răceală 1","🤒 Răceală 2","😴 Insomnie","😰 Stres","🌱 Astenie","🤕 Durere cap","🔙 Durere spate","🗣️ Durere gât","🤢 Durere stomac"],
+  fr: ["🤧 Rhume 1","🤒 Rhume 2","😴 Insomnie","😰 Stress","🌱 Asthénie","🤕 Mal de tête","🔙 Mal de dos","🗣️ Mal de gorge","🤢 Mal au ventre"]
+};
+
+const SECTION_TITLES = {
+  ro: { s: "🔵 Simptome — ce spune pacientul", c: "🟠 Cauze — de ce s-a întâmplat", t: "🟢 Tratament — ce recomandă farmacistul", d: "🟣 Dialog tip pentru acest subiect" },
+  fr: { s: "🔵 Symptômes — ce que dit le patient", c: "🟠 Causes — pourquoi c'est arrivé", t: "🟢 Traitement — ce que recommande le pharmacien", d: "🟣 Dialogue type pour ce sujet" }
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById("btn-ro").classList.toggle("active", lang === "ro");
+  document.getElementById("btn-fr").classList.toggle("active", lang === "fr");
+  renderAll();
+}
+
+function showCard(index) {
+  currentCard = index;
+  renderAll();
+}
+
+function renderAll() {
+  renderTabs();
+  renderCards();
+}
+
+function renderTabs() {
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = "";
+  TAB_LABELS[currentLang].forEach((label, i) => {
+    const btn = document.createElement("button");
+    btn.className = "tab" + (i === currentCard ? " active" : "");
+    btn.textContent = label;
+    btn.onclick = () => showCard(i);
+    tabs.appendChild(btn);
+  });
+}
+
+function renderCards() {
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+  const lang = currentLang;
+  const titles = SECTION_TITLES[lang];
+  const farmLabel = lang === "ro" ? "👨‍⚕️ Farmacist" : "👨‍⚕️ Pharmacien";
+  const patLabel = lang === "ro" ? "🧑 Pacient" : "🧑 Patient";
+
+  SUBJECTS.forEach((s, i) => {
+    const card = document.createElement("div");
+    card.className = "card" + (i === currentCard ? " active" : "");
+
+    card.innerHTML = `
+      <div class="card-emoji">${s.emoji}</div>
+      <div class="card-title">${s.title[lang]}</div>
+
+      <div class="section section-symptome">
+        <div class="section-title">${titles.s}</div>
+        ${s.simptome[lang].map(x => `<div class="item"><div class="item-dot"></div><div>${x}</div></div>`).join("")}
+      </div>
+
+      <div class="section section-cause">
+        <div class="section-title">${titles.c}</div>
+        ${s.cauze[lang].map(x => `<div class="item"><div class="item-dot"></div><div>${x}</div></div>`).join("")}
+      </div>
+
+      <div class="section section-traitement">
+        <div class="section-title">${titles.t}</div>
+        ${s.tratament[lang].map(x => `<div class="item"><div class="item-dot"></div><div>${x}</div></div>`).join("")}
+      </div>
+
+      <div class="section section-dialog">
+        <div class="section-title">${titles.d}</div>
+        ${s.dialog[lang].map(d => `
+          <div class="dialog-line dialog-${d.role}">
+            <div class="dialog-who">${d.role === "F" ? farmLabel : patLabel}</div>
+            ${d.text}
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="tip">${s.tip[lang]}</div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+renderAll();
+</script>
+</body>
+</html>
