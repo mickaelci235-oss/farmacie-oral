@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Script Oral Farmacie</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    font-family: Georgia, serif;
+    padding: 24px 16px 48px;
+    color: #fff;
+  }
+
+  /* HEADER */
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 7px 22px;
+    color: #a8d8ea;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(22px,5vw,36px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+  }
+  .subtitle { color: #8ab4c8; font-size: 14px; }
+  .header { text-align: center; margin-bottom: 28px; }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  select, button {
+    border-radius: 30px;
+    padding: 9px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2);
+    outline: none;
+    transition: all 0.2s;
+    font-family: Georgia, serif;
+  }
+  select {
+    background: rgba(255,255,255,0.1);
+    color: #8ab4c8;
+  }
+  select.chosen { color: #fff; }
+  .btn-role {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-weight: 400;
+  }
+  .btn-role.active {
+    background: linear-gradient(135deg, #00b4d8, #0077b6);
+    border-color: #00b4d8;
+    font-weight: 700;
+  }
+  .btn-note {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+  .btn-note.active {
+    background: linear-gradient(135deg, #f77f00, #d62828);
+    border-color: #f77f00;
+    font-weight: 700;
+  }
+
+  /* BANNER */
+  .banner {
+    max-width: 760px;
+    margin: 0 auto 20px;
+    background: rgba(0,180,216,0.15);
+    border: 1px solid rgba(0,180,216,0.4);
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #a8d8ea;
+    font-size: 14px;
+    text-align: center;
+    display: none;
+  }
+  .banner span { color: #fff; font-weight: 700; }
+
+  /* SCRIPT */
+  #script {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .turn {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .turn.pacient { flex-direction: row-reverse; }
+
+  .avatar {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .avatar.F { background: linear-gradient(135deg,#00b4d8,#0077b6); box-shadow: 0 4px 14px rgba(0,180,216,0.4); }
+  .avatar.P { background: linear-gradient(135deg,#f77f00,#d62828); box-shadow: 0 4px 14px rgba(247,127,0,0.4); }
+
+  .bubble-wrap { flex: 1; max-width: 85%; }
+
+  .role-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: monospace;
+  }
+  .turn.farmacist .role-label { color: #00b4d8; text-align: left; }
+  .turn.pacient .role-label { color: #f77f00; text-align: right; }
+
+  .bubble {
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #fff;
+  }
+  .turn.farmacist .bubble {
+    background: rgba(0,180,216,0.1);
+    border: 1px solid rgba(0,180,216,0.25);
+    border-radius: 4px 18px 18px 18px;
+  }
+  .turn.pacient .bubble {
+    background: rgba(247,127,0,0.1);
+    border: 1px solid rgba(247,127,0,0.25);
+    border-radius: 18px 4px 18px 18px;
+  }
+
+  .note {
+    margin-top: 8px;
+    background: rgba(255,193,7,0.08);
+    border: 1px solid rgba(255,193,7,0.25);
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  .note-title {
+    color: #ffc107;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: monospace;
+  }
+  .note-option {
+    color: #e8d5a3;
+    font-size: 13px;
+    line-height: 1.65;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,193,7,0.1);
+  }
+  .note-option:last-child { border-bottom: none; }
+
+  .footer {
+    text-align: center;
+    color: #4a7a8a;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-top: 36px;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Examen Oral · Farmacie FR II</div>
+  <h1>Script Universal 💊</h1>
+  <p class="subtitle">Farmacist + Pacient — toate cele 9 subiecte</p>
+</div>
+
+<div class="controls">
+  <select id="subjectSelect" onchange="updateSubject()">
+    <option value="">🎲 Alege subiectul...</option>
+    <option>Răceală 1 (naturist)</option>
+    <option>Răceală 2</option>
+    <option>Insomnie</option>
+    <option>Stres</option>
+    <option>Astenie de primăvară</option>
+    <option>Durere de cap</option>
+    <option>Durere de spate</option>
+    <option>Durere de gât</option>
+    <option>Durere de stomac</option>
+  </select>
+
+  <button class="btn-role active" id="btn-both" onclick="setRole('both')">👥 Ambele roluri</button>
+  <button class="btn-role" id="btn-F" onclick="setRole('F')">👨‍⚕️ Farmacist</button>
+  <button class="btn-role" id="btn-P" onclick="setPRole('P')">🧑 Pacient</button>
+  <button class="btn-note active" id="btn-note" onclick="toggleNotes()">💡 Aide visible</button>
+</div>
+
+<div class="banner" id="banner">
+  📋 Subiect selectat: <span id="bannerText"></span> — Adaptează opțiunile din căsuțele galbene!
+</div>
+
+<div id="script"></div>
+
+<div class="footer">Bulele albastre = Farmacist · Bulele portocalii = Pacient</div>
+
+<script>
+const SCRIPT = [
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Bună ziua!",
+    note: null
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Bună ziua! Bine ați venit. Cu ce vă pot ajuta astăzi?",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Nu mă simt prea bine. Am venit să cer un sfat.",
+    note: null
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Sigur, cu plăcere. Ce simptome aveți?",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Am [simptomul principal de pe bilet].",
+    note: {
+      title: "Spune simptomul de pe bilet, de exemplu:",
+      options: [
+        "Am nas înfundat, tuse și mă doare gâtul. → Răceală 1 sau 2",
+        "Nu pot să dorm noaptea, sunt mereu obosit(ă). → Insomnie",
+        "Sunt foarte stresat(ă), am dureri de cap și nu mă pot concentra. → Stres",
+        "Mă simt slăbit(ă), fără energie, de câteva zile. → Astenie de primăvară",
+        "Mă doare capul, mai ales după ce stau mult la calculator. → Durere de cap",
+        "Mă doare spatele după ce am făcut sport / grădinărit. → Durere de spate",
+        "Mă doare gâtul când înghit, am vorbit mult astăzi. → Durere de gât",
+        "Mă doare stomacul, am greață și digestie grea. → Durere de stomac"
+      ]
+    }
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Înțeleg. De când aveți aceste simptome?",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "De [ieri / două zile / trei zile / o săptămână].",
+    note: {
+      title: "Alege ce ți se pare logic:",
+      options: [
+        "De ieri.",
+        "De două zile.",
+        "De câteva zile.",
+        "De o săptămână."
+      ]
+    }
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Știți care ar putea fi cauza?",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Cred că din cauza [cauzei de pe bilet].",
+    note: {
+      title: "Spune cauza de pe bilet, de exemplu:",
+      options: [
+        "Cred că am răcit, a fost frig afară. → Răceală",
+        "Sunt foarte stresat(ă) de la muncă / examene. → Insomnie sau Stres",
+        "Am stat prea mult la calculator / telefon. → Durere de cap",
+        "Am făcut sport / am lucrat în grădină. → Durere de spate",
+        "Am vorbit mult, am țipat la un meci. → Durere de gât",
+        "Am mâncat prea mult / am mâncat greu. → Durere de stomac",
+        "Este schimbarea de sezon, primăvara. → Astenie de primăvară"
+      ]
+    }
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Aveți și alte simptome? Febră, oboseală, greață?",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Da / Nu [simptome secundare].",
+    note: {
+      title: "Răspunde simplu:",
+      options: [
+        "Da, am și puțină febră și oboseală.",
+        "Da, sunt și obosit(ă) și am dureri de cap.",
+        "Nu, doar [simptomul principal].",
+        "Nu, în rest mă simt bine."
+      ]
+    }
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Înțeleg. Pare [diagnosticul]. Vă recomand [tratamentul de pe bilet].",
+    note: {
+      title: "Spune diagnosticul + tratamentul de pe bilet, de exemplu:",
+      options: [
+        "Pare o răceală ușoară. Vă recomand ceai de tei cu miere și vitamina C. → Răceală 1 (naturist)",
+        "Pare o răceală. Vă recomand Paracetamol și un sirop de tuse. → Răceală 2",
+        "Pare insomnie. Vă recomand un ceai de valeriană sau melatonină. → Insomnie",
+        "Pare stres acut. Vă recomand magneziu și un ceai de mușețel. → Stres",
+        "Pare astenie de primăvară. Vă recomand un supliment de vitamine. → Astenie",
+        "Pare o durere de cap de tensiune. Vă recomand Ibuprofen sau Paracetamol. → Durere de cap",
+        "Pare o contractură musculară. Vă recomand un gel antiinflamator și repaus. → Durere de spate",
+        "Pare o iritație a gâtului. Vă recomand spray pentru gât și pastile de supt. → Durere de gât",
+        "Pare o indigestie. Vă recomand un antiacid sau ceai de mentă. → Durere de stomac"
+      ]
+    }
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Luați [doza] de [X] ori pe zi, [când], timp de [X] zile.",
+    note: {
+      title: "Explică dozajul, de exemplu:",
+      options: [
+        "Luați o tabletă de două ori pe zi, după masă, timp de cinci zile.",
+        "Beți un ceai de trei ori pe zi, timp de o săptămână.",
+        "Aplicați gelul de două ori pe zi pe zona dureroasă, timp de cinci zile.",
+        "Luați un plic dimineața și unul seara, timp de o săptămână.",
+        "Luați o tabletă înainte de culcare, timp de zece zile.",
+        "Sugeți o pastilă de trei ori pe zi, timp de cinci zile."
+      ]
+    }
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Înțeleg. Există și alte recomandări?",
+    note: null
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Da, vă recomand să [recomandări generale].",
+    note: {
+      title: "Alege 2-3 recomandări potrivite subiectului:",
+      options: [
+        "Odihniți-vă cât mai mult. → orice subiect",
+        "Beți multă apă și ceaiuri calde. → Răceală / Gât / Stomac",
+        "Evitați frigul și curenții de aer. → Răceală / Gât",
+        "Evitați ecranele seara înainte de culcare. → Insomnie / Durere de cap",
+        "Faceți exerciții de relaxare sau meditație. → Stres / Insomnie",
+        "Mâncați fructe și legume proaspete. → Astenie / Stomac",
+        "Evitați efortul fizic intens câteva zile. → Durere de spate",
+        "Evitați alimentele grele și mâncați mai puțin. → Durere de stomac",
+        "Aerisiți camera înainte de culcare. → Insomnie",
+        "Faceți pauze regulate de la calculator. → Durere de cap"
+      ]
+    }
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Dacă simptomele nu se ameliorează în trei până la cinci zile, vă rog să consultați un medic.",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Mulțumesc mult. Cât costă?",
+    note: null
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Faceți [X] lei, vă rog.",
+    note: {
+      title: "Inventează un preț logic:",
+      options: [
+        "Faceți douăzeci de lei, vă rog.",
+        "Faceți treizeci și cinci de lei, vă rog.",
+        "Faceți patruzeci de lei, vă rog."
+      ]
+    }
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Poftim. Pot plăti cu cardul?",
+    note: null
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Bineînțeles, cu plăcere.",
+    note: null
+  },
+  {
+    role: "P",
+    label: "PACIENT",
+    line: "Vă mulțumesc frumos pentru ajutor. La revedere!",
+    note: null
+  },
+  {
+    role: "F",
+    label: "FARMACIST",
+    line: "Cu plăcere! Însănătoșire grabnică! La revedere!",
+    note: null
+  }
+];
+
+let currentRole = "both";
+let showNotes = true;
+
+function setRole(role) {
+  currentRole = role;
+  document.querySelectorAll(".btn-role").forEach(b => b.classList.remove("active"));
+  if (role === "both") document.getElementById("btn-both").classList.add("active");
+  else if (role === "F") document.getElementById("btn-F").classList.add("active");
+  else document.getElementById("btn-P").classList.add("active");
+  renderScript();
+}
+
+function setPRole(role) {
+  setRole(role);
+}
+
+function toggleNotes() {
+  showNotes = !showNotes;
+  const btn = document.getElementById("btn-note");
+  if (showNotes) {
+    btn.classList.add("active");
+    btn.textContent = "💡 Aide visible";
+  } else {
+    btn.classList.remove("active");
+    btn.textContent = "💡 Afficher l'aide";
+  }
+  renderScript();
+}
+
+function updateSubject() {
+  const sel = document.getElementById("subjectSelect");
+  const val = sel.value;
+  const banner = document.getElementById("banner");
+  if (val) {
+    sel.classList.add("chosen");
+    banner.style.display = "block";
+    document.getElementById("bannerText").textContent = val;
+  } else {
+    sel.classList.remove("chosen");
+    banner.style.display = "none";
+  }
+}
+
+function renderScript() {
+  const container = document.getElementById("script");
+  container.innerHTML = "";
+
+  SCRIPT.forEach(item => {
+    if (currentRole !== "both" && item.role !== currentRole) return;
+
+    const turn = document.createElement("div");
+    turn.className = "turn " + (item.role === "F" ? "farmacist" : "pacient");
+
+    // Avatar
+    const avatar = document.createElement("div");
+    avatar.className = "avatar " + item.role;
+    avatar.textContent = item.role === "F" ? "👨‍⚕️" : "🧑";
+
+    // Bubble wrap
+    const wrap = document.createElement("div");
+    wrap.className = "bubble-wrap";
+
+    // Role label
+    const label = document.createElement("div");
+    label.className = "role-label";
+    label.textContent = item.label;
+
+    // Bubble
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = item.line;
+
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+
+    // Note
+    if (showNotes && item.note) {
+      const note = document.createElement("div");
+      note.className = "note";
+
+      const title = document.createElement("div");
+      title.className = "note-title";
+      title.textContent = "💡 " + item.note.title;
+      note.appendChild(title);
+
+      item.note.options.forEach(opt => {
+        const o = document.createElement("div");
+        o.className = "note-option";
+        o.textContent = "→ " + opt;
+        note.appendChild(o);
+      });
+
+      wrap.appendChild(note);
+    }
+
+    turn.appendChild(avatar);
+    turn.appendChild(wrap);
+    container.appendChild(turn);
+  });
+}
+
+// Initial render
+renderScript();
+</script>
+</body>
+</html>
